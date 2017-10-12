@@ -1,0 +1,1106 @@
+{% extends "header.html" %}
+
+{% block body %}
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist" id="myTab">
+    {% for t in count %}
+    {% if t['Status'] == '0' %}
+    <li role="presentation" class="active"><a href="#New" aria-controls="New" role="tab" data-toggle="tab">New Cases  <span class="badge">{{(SSP_C)|string + '/' + t['Count']|string}}</span></a></li>
+    {% elif t['Status'] == '1' %}
+    <li role="presentation"><a href="#Surveyed" aria-controls="Surveyed" role="tab" data-toggle="tab">Surveyed Cases  <span class="badge">{{rBack_C|string + '/' + lBack_C|string}}</span></a></li>
+    {% elif t['Status'] == '1.5' %}
+    <li role="presentation"><a href="#Pending" aria-controls="Pending" role="tab" data-toggle="tab">Pending Approval  <span class="badge">{{t['Count']|string}}</span></a></li>
+    {% elif t['Status'] == '2' %}
+    <li role="presentation"><a href="#Approved" aria-controls="Approved" role="tab" data-toggle="tab">Approved Cases  <span class="badge">{{t['Count']|string}}</span></a></li>
+    
+    <!-- <li role="presentation"><a href="#Need" aria-controls="Need" role="tab" data-toggle="tab">Need st.</a></li>
+    <li role="presentation"><a href="#Draft" aria-controls="Draft" role="tab" data-toggle="tab">Draft</a></li> -->
+    {% elif t['Status'] == '8' %}
+    <li role="presentation"><a href="#Bad" aria-controls="Bad" role="tab" data-toggle="tab">Bad TSRF  <span class="badge">{{t['Count']|string}}</span></a></li>
+    {% endif %}
+    {% endfor %}
+    <li role="presentation"><a href="#Support" aria-controls="Support" role="tab" data-toggle="tab">Support</a></li>
+    {% if session.username == 'adminjiao' %}
+    <li role="presentation"><a href="#joey" aria-controls="joey" role="tab" data-toggle="tab">Master Joey</a></li>
+    {% endif %}
+  </ul>
+  
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane fade in active" id="New">
+        
+        <table class="table table-hover"> 
+            <tr>
+                <td class="col-md-1">SFDC#</td>
+                <td class="col-md-2">Name</td>
+                <td class="col-md-1">Info</td>
+                <td class="col-md-1">SSP</td>
+                <td class="col-md-2">CAD Appt</td>
+            </tr>
+            {% for t in info %}
+            {% if t['Status'] == '0' %}
+            <tr>
+                <td class="col-md-1"><a href="{{'https://levelsolar.app.box.com/files/0/f/'+t['ITid']}}" id="{{t['Case#']|string+'install'}}">{{t['Case#']}}</a></td>
+                <td class="col-md-2"><a href={{'https://www.google.com/maps/place/'+t['GOOG']}} data-toggle="tooltip" title="{{t['Address']}}"><span class="glyphicon glyphicon-home"></span></a>  <a href={{'https://na33.salesforce.com/'+t['Accountid']}} id="{{t['Case#']}}">  {{t['Name']}}</a></td>
+                
+                <td class="col-md-1"><button type="button" {% if t['Infock'] == 1 %} class="btn btn-info" {% elif t['au'] == '' %} class="btn btn-danger" {% else %} class="btn btn-default" {% endif %} data-toggle="modal" data-target="#infoNew" data-number = "{{t['Case#']}}" data-whatever= "{{t['Case#']|string + " " + t['Name'] + ' w/ Utility#: ' + t['UTT']}}" data-amp = "{{t['amp']}}" data-rsi = "{{t['rsi']}}" data-rsp = "{{t['rsp']}}" data-au = "{{t['au']}}" data-note = "{{t['Note']}}" data-cklist = "{{t['issueCKBox'][0]+','+t['issueCKBox'][1]+','+t['issueCKBox'][2]}}">Info</button></td>
+                
+                <div class="modal fade" id="infoNew" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">New message</h4>
+                      </div>
+                      <div class="modal-body">
+                        <form id="form-info" method = "post">
+                          <div class="form-group">
+                            <label for="total-amperage" class="control-label">Total Amperage:</label>
+                            <input type="text" class="form-control" id="total-amperage" name="total-amperage">
+                          </div>
+                          <div class="form-group">
+                            <label for="rafter-sizing" class="control-label">Rafter Sizing:</label>
+                            <input type="text" class="form-control" id="rafter-sizing" name="rafter-sizing">
+                          </div>
+                          <div class="form-group">
+                            <label for="rafter-spacing" class="control-label">Rafter Spacing:</label>
+                            <input type="text" class="form-control" id="rafter-spacing" name="rafter-spacing">
+                          </div>
+                          <div class="form-group">
+                            <label for="annual-usage" class="control-label" id="annual-usage-label" name="annual-usage-label">Annual Usage:</label>
+                            <input type="text" class="form-control" id="annual-usage" name="annual-usage">
+                          </div>
+                          <div class="form-group">
+                            <label for="design-note" class="control-label">Design Note:</label>
+                            <input type="text" class="form-control" id="design-note" name="design-note">
+                          </div>
+                          <div class="form-group">
+                            <label for="new_ckList" class="control-label">Related Issues:</label>
+                            <div>
+                            <span class="list-item">
+                              <label>
+                                <input type="checkbox" name="new_ckList0" id="new_ckList0">&nbsp;Energy Audit
+                              </label>
+                              <label>
+                                <input type="checkbox" name="new_ckList1" id="new_ckList1">&nbsp;Rusted Meter
+                              </label>
+                              <label>
+                                <input type="checkbox" name="new_ckList2" id="new_ckList2">&nbsp;Breaker Issue
+                              </label>
+                            </span>
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                              <button type="submit" class="btn btn-primary">Save</button>
+                          </div>                          
+                        </form>
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <td class="col-md-1">
+                {% if t['SSP'] == 1 %}
+                <button type="button" class="btn btn-info">SSP &#x2714;</button>
+                {% elif session.username == 'adminjiao' %}
+                <form action="{{'/ssp/' + t['Case#']|string + '?api_key=Jo3y1SAW3S0M3'}}">
+                    <input type="submit" class="btn btn-default" value="SSP ?">
+                </form>
+                {% else %}
+                <button type="button" class="btn">SSP ?</button>
+                {% endif %}
+                </td>
+                {% if t['apt_ck'] == 2 %}
+                <td class="col-md-2 danger">
+                {% elif t['apt_ck'] == 1 %}
+                <td class="col-md-2 info">
+                {% else %}
+                <td class="col-md-2">
+                {% endif %}
+                    <div class="form-group has-feedback">
+                    <form action="{{'/caseappdate_new/' + t['Case#']|string + '?api_key=Jo3y1SAW3S0M3'}}" method="post">
+                        <input type="text" class="form-control" value="{{t['CADAPT']}}" name="app-date-new" required/>
+                        <i class="glyphicon glyphicon glyphicon-floppy-disk form-control-feedback btn"></i>
+                    </form>
+                    </div>
+                </td>
+                {% if session.username == 'adminjiao'%}
+                <td class="col-md-1">
+                <form action={{'/case/caseremove/' + t['Case#']|string + '?api_key=Jo3y1SAW3S0M3' }} method="get">
+                    <button type="submit" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </form>
+                </td>
+                {% endif %}
+                
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+
+    </div>
+    <div role="tabpanel" class="tab-pane fade" id="Surveyed">
+        <table class="table table-hover"> 
+            <tr>
+                <td class="col-md-1">SFDC#</td>
+                <td class="col-md-2">Name</td>
+                <td class="col-md-3">Note</td>
+                <td class="col-md-1">Info</td>
+                <td class="col-md-1">Shading</td>
+                <td class="col-md-1">Designer</td>
+                <td class="col-md-2">CAD Appt</td>
+            </tr>
+            {% for t in info %}
+            {% if t['Status'] == '1' %}
+            {% if t['CADAPT'] == 'g2g-now' %}
+            <tr class="danger">
+            {% else %}
+            <tr>
+            {% endif %}
+                <td class="col-md-1"><a href="{{'https://levelsolar.app.box.com/files/0/f/'+t['ITid']}}" id="{{t['Case#']|string+'install'}}">{{t['Case#']}}</a></td>
+                <td class="col-md-2"> <a href={{'https://www.google.com/maps/place/'+t['GOOG']}} data-toggle="tooltip" title="{{t['Address']}}"><span class="glyphicon glyphicon-home"></span></a> <a href={{'https://na33.salesforce.com/'+t['Accountid']}} id="{{t['Case#']}}">  {{t['Name']}}</a></td>
+                <td class="col-md-3">{{t['Note']}}</td>
+                
+                <td class="col-md-1"><button type="button" {% if t['Infock'] == 1 %} class="btn btn-info" {% elif t['au'] == '' %} class="btn btn-danger" {% else %} class="btn btn-default" {% endif %} data-toggle="modal" data-target="#infoSurvey" data-whatever= "{{t['Case#']|string + " " + t['Name'] + ' w/ Utility#: ' + t['UTT']}}" data-number = "{{t['Case#']}}" data-amp = "{{t['amp']}}" data-rsi = "{{t['rsi']}}" data-rsp = "{{t['rsp']}}" data-au = "{{t['au']}}" data-note = "{{t['Note']}}" data-cklist = "{{t['issueCKBox'][0]+','+t['issueCKBox'][1]+','+t['issueCKBox'][2]}}">Info</button></td>
+              
+                <div class="modal fade" id="infoSurvey" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">New message</h4>
+                      </div>
+                      <div class="modal-body">
+                        <form id="f-i" method = "post">
+                          <div class="form-group">
+                            <label for="t-a" class="control-label">Total Amperage:</label>
+                            <input type="text" class="form-control" id="t-a" name="t-a">
+                          </div>
+                          <div class="form-group">
+                            <label for="r-si" class="control-label">Rafter Sizing:</label>
+                            <input type="text" class="form-control" id="r-si" name="r-si">
+                          </div>
+                          <div class="form-group">
+                            <label for="r-sp" class="control-label">Rafter Spacing:</label>
+                            <input type="text" class="form-control" id="r-sp" name="r-sp">
+                          </div>
+                          <div class="form-group">
+                            <label for="a-u" class="control-label">Annual Usage:</label>
+                            <input type="text" class="form-control" id="a-u" name="a-u">
+                          </div>
+                          <div class="form-group">
+                            <label for="d-n" class="control-label">Design Note:</label>
+                            <input type="text" class="form-control" id="d-n" name="d-n">
+                          </div>
+                          <div class="form-group">
+                            <label for="survey_ckList" class="control-label">Related Issues:</label>
+                            <div>
+                            <span class="list-item">
+                              <label>
+                                <input type="checkbox" name="survey_ckList0" id="survey_ckList0">&nbsp;Energy Audit
+                              </label>
+                              <label>
+                                <input type="checkbox" name="survey_ckList1" id="survey_ckList1">&nbsp;Rusted Meter
+                              </label>
+                              <label>
+                                <input type="checkbox" name="survey_ckList2" id="survey_ckList2">&nbsp;Breaker Issue
+                              </label>
+                            </span>
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                              <button type="submit" class="btn btn-primary">Save</button>
+                          </div>                          
+                        </form>
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <td class="col-md-1">
+                <form action="{{'/shading_matrix/' + t['Case#']|string + '?api_key=Jo3y1SAW3S0M3'}}" name="shadingForm" id="{{'shadingForm' + t['Case#']|string}}" method="POST">
+                    <input class="span2" id="{{'designer' + t['Case#']|string}}" name="designer" type="hidden">
+                    {% if t['Shading'] == None or t['Shading'] == 'None' %}
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-small btn-default dropdown-toggle" data-toggle="dropdown" >{{t['Shading']}}<span class="caret"></span></button>
+                      <ul class="dropdown-menu dropdown-designer" role="menu">
+                        <!-- <li onclick="$('#{{'designer' + t['Case#']|string}}').val('Stephanie'); $('#{{'shadingForm' + t['Case#']|string}}').submit()"><a href="#">Stephanie</a></li> -->
+                        <!-- <li onclick="$('#{{'designer' + t['Case#']|string}}').val('Victor'); $('#{{'shadingForm' + t['Case#']|string}}').submit()"><a href="#">Victor</a></li> -->
+                        <!-- <li onclick="$('#{{'designer' + t['Case#']|string}}').val('Rebecca'); $('#{{'shadingForm' + t['Case#']|string}}').submit()"><a href="#">Rebecca</a></li> -->
+                        <!-- <li onclick="$('#{{'designer' + t['Case#']|string}}').val('Silun'); $('#{{'shadingForm' + t['Case#']|string}}').submit()"><a href="#">Silun</a></li> -->
+                        
+                        <!-- <li onclick="$('#{{'designer' + t['Case#']|string}}').val('Lukas'); $('#{{'shadingForm' + t['Case#']|string}}').submit()"><a href="#">Lukas</a></li> -->
+                        <li onclick="$('#{{'designer' + t['Case#']|string}}').val('Justin'); $('#{{'shadingForm' + t['Case#']|string}}').submit()"><a href="#">Justin</a></li>
+                        <li onclick="$('#{{'designer' + t['Case#']|string}}').val('Naima'); $('#{{'shadingForm' + t['Case#']|string}}').submit()"><a href="#">Naima</a></li>
+                        <!-- <li onclick="$('#{{'designer' + t['Case#']|string}}').val('Ren'); $('#{{'shadingForm' + t['Case#']|string}}').submit()"><a href="#">Ren</a></li> -->
+                        <li onclick="$('#{{'designer' + t['Case#']|string}}').val('Meredith'); $('#{{'shadingForm' + t['Case#']|string}}').submit()"><a href="#">Meredith</a></li>
+                        <li onclick="$('#{{'designer' + t['Case#']|string}}').val('Michael'); $('#{{'shadingForm' + t['Case#']|string}}').submit()"><a href="#">Michael</a></li>
+                      </ul>
+                    </div>
+                    {% else %}
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-small btn-info dropdown-toggle" data-toggle="dropdown" >Done<span class="caret"></span></button>
+                      <ul class="dropdown-menu dropdown-designer" role="menu">
+                        <li onclick="$('#{{'designer' + t['Case#']|string}}').val('None'); $('#{{'shadingForm' + t['Case#']|string}}').submit()"><a href="#">None</a></li>
+                      </ul>
+                    </div>
+                    {% endif %}
+                </form>
+                </td>
+                <td class="col-md-1">
+                <form action="{{'/casedesigner/' + t['Case#']|string}}" name="searchForm" id="{{'searchForm' + t['Case#']|string}}" method="POST">
+                    <input class="span2" id="{{'search_type' + t['Case#']|string}}" name="search_type" type="hidden">
+                    {% if t['Designer'] == None or t['Designer'] == 'None' %}
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-small btn-default dropdown-toggle" data-toggle="dropdown" >{{t['Designer']}}<span class="caret"></span></button>
+                      <ul class="dropdown-menu dropdown-designer" role="menu">
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Tina'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Tina</a></li> -->
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Yao'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Yao</a></li> -->
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Stephanie'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Stephanie</a></li> -->
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Victor'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Victor</a></li> -->
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Rebecca'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Rebecca</a></li> -->
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Silun'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Silun</a></li> -->
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Lukas'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Lukas</a></li> -->
+                        <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Michael'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Michael</a></li>
+                        <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Justin'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Justin</a></li>
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Ren'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Ren</a></li> -->
+                        <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Meredith'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Meredith</a></li>
+                        <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Naima'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Naima</a></li>
+                        
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Alessandro'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Alessandro</a></li> -->
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Joey'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Joey</a></li> -->
+                        <li role="separator" class="divider"></li>
+                        <!--
+                        <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('None'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">None</a></li>
+                        -->
+                        <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('8'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Bad TSRF</a></li>
+                        <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Survey Issue'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Survey Issue</a></li>
+                      </ul>
+                    </div>
+                    {% else %}
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-small btn-info dropdown-toggle" data-toggle="dropdown" >{{t['Designer']}}<span class="caret"></span></button>
+                      <ul class="dropdown-menu dropdown-designer" role="menu">
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Tina'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Tina</a></li> -->
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Yao'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Yao</a></li> -->
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Stephanie'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Stephanie</a></li> -->
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Victor'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Victor</a></li> -->
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Rebecca'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Rebecca</a></li> -->
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Silun'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Silun</a></li> -->
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Lukas'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Lukas</a></li> -->
+                        <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Michael'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Michael</a></li>
+                        <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Justin'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Justin</a></li>
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Ren'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Ren</a></li> -->
+                        <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Meredith'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Meredith</a></li>
+                        <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Naima'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Naima</a></li>
+                        
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Alessandro'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Alessandro</a></li> -->
+                        <!-- <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Joey'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Joey</a></li> -->
+                        <li role="separator" class="divider"></li>
+                        <!--
+                        <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('None'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">None</a></li>
+                        -->
+                        <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('8'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Bad TSRF</a></li>
+                        <li onclick="$('#{{'search_type' + t['Case#']|string}}').val('Survey Issue'); $('#{{'searchForm' + t['Case#']|string}}').submit()"><a href="#">Survey Issue</a></li>
+                      </ul>
+                    </div>
+                    {% endif %}
+                </form>
+                </td>
+                {% if t['apt_ck'] == 2 %}
+                <td class="col-md-2 danger">
+                {% elif t['apt_ck'] == 1 %}
+                <td class="col-md-2 info">
+                {% else %}
+                <td class="col-md-2">
+                {% endif %}
+                    <div class="form-group has-feedback">
+                    <form action="{{'/caseappdate/' + t['Case#']|string + '?api_key=Jo3y1SAW3S0M3'}}" method="post">
+                        <input type="text" class="form-control" value="{{t['CADAPT']}}" name="app-date" required/>
+                        <i class="glyphicon glyphicon glyphicon-floppy-disk form-control-feedback btn"></i>
+                    </form>
+                    </div>
+                </td>
+                {% if session.username == 'adminjiao'%}
+                <td class="col-md-1">
+                <form action={{'/case/caseremove/' + t['Case#']|string + '?api_key=Jo3y1SAW3S0M3' }} method="get">
+                    <button type="submit" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </form>
+                </td>
+                {% endif %}    
+            </tr>
+            
+            {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+    <div role="tabpanel" class="tab-pane fade" id="Pending">
+        <table class="table table-hover">
+            <tr>
+                <td class="col-md-1">SFDC#</td>
+                <td class="col-md-2">Name</td>
+                <td class="col-md-2">Designer</td>
+                <td class="col-md-1">Approval Status</td>
+                <td class="col-md-1"></td>
+                <td class="col-md-1"></td>
+                <td class="col-md-1">CAD Appt</td>
+            </tr>
+            {% for t in info %}
+            {% if t['Status'] == '1.5' %}
+            
+            {% if t['ConE'] == '0' %}
+            <tr>
+            {% elif t['ConE'] == '1' %}
+            <tr class="danger">
+            {% endif %}
+                <td class="col-md-1"><a href={{'https://levelsolar.app.box.com/files/0/f/'+t['PTid']+'/1/f_'+t['CAD']}} data-toggle="tooltip" title="{{t['designIssues']}}">{{t['Case#']}}</a></td>
+                <td class="col-md-2"><a href={{'https://www.google.com/maps/place/'+t['GOOG']}} data-toggle="tooltip" title="{{t['Address']}}"><span class="glyphicon glyphicon-home"></span></a>  <a href={{'https://levelsolar.app.box.com/files/0/f/'+t['PTid']}} data-toggle="tooltip" title="{{t['Note']}}"  id="{{t['Case#']}}">{{t['Name']}}</a></td>
+                <td class="col-md-2"><a href="{{'https://levelsolar.app.box.com/files/0/f/'+t['ITid']}}" id="{{t['Case#']|string+'install'}}">{{t['Designer']}}</a></td>
+                <td class="col-md-1">
+                {% if t['PB'] == 1 %}
+                <button type="button" class="btn btn-info">Pre BMC &#x2714;</button>
+                {% else %}
+                <form action="{{'/pbqc/' + t['Case#']|string}}">
+                    <input type="submit" class="btn btn-default" value="Pre BMC ?">
+                </form>
+                {% endif %}
+                </td>
+                <td class="col-md-1">
+                {% if t['AD'] == 1 %}
+                <button type="button" class="btn btn-info">Senior AD &#x2714;</button>
+                {% else %}
+                <form action="{{'/adqc/' + t['Case#']|string}}">
+                    <input type="submit" class="btn btn-default" value="Senior AD ?">
+                </form>
+                {% endif %}
+                </td>
+                <td class="col-md-1"><button type="button" class="btn btn-danger" data-toggle="modal" data-target="#infoModalReject" data-whatever= "{{t['Case#']|string + " " + t['Name'] }}" data-note = "{{t['Note']}}" data-number = "{{t['Case#']}}">REJECT!</button></td>
+                <div class="modal fade" id="infoModalReject" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">New message</h4>
+                      </div>
+                      <div class="modal-body">
+                        <form id="form-reject" method = "post">
+                          <div class="form-group">
+                            <label for="reject_note" class="control-label">Angry Note:</label>
+                            <textarea type="reject_note" class="form-control" id="reject_note" name="reject_note"></textarea>
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                              <button type="submit" class="btn btn-danger">REJECT!</button>
+                          </div>
+                        </form>
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% if t['apt_ck'] == 2 %}
+                <td class="col-md-1 danger">
+                {% elif t['apt_ck'] == 1 %}
+                <td class="col-md-1 info">
+                {% else %}
+                <td class="col-md-1">
+                {% endif %}
+                {{t['CADAPT']}}
+                </td>
+                {% if session.username == 'adminjiao'%}
+                <td class="col-md-1">
+                <form action={{'/case/caseremove/' + t['Case#']|string + '?api_key=Jo3y1SAW3S0M3' }} method="get">
+                    <button type="submit" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </form>
+                </td>
+                {% endif %}
+            <tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+    <div role="tabpanel" class="tab-pane fade" id="Approved">
+        <table class="table table-hover"> 
+            <tr>
+                <td class="col-md-1">SFDC#</td>
+                <td class="col-md-2">Name</td>
+                <td class="col-md-2">Designer</td>
+                <td class="col-md-1">Info</td>
+                <td class="col-md-3">Status</td>
+                <td class="col-md-1"></td>
+                <td class="col-md-1">CAD Appt</td>
+            </tr>
+            {% for t in info %}
+            {% if t['Status'] == '2' %}
+            
+            {% if t['ConE'] == '0' %}
+            <tr>
+            {% elif t['ConE'] == '1' %}
+            <tr class="danger">
+            {% endif %}
+                <td class="col-md-1"><a href="{{'https://levelsolar.app.box.com/files/0/f/'+t['ITid']}}" id="{{t['Case#']|string+'install'}}">{{t['Case#']}}</a></td>
+                <td class="col-md-2"><a href={{'https://www.google.com/maps/place/'+t['GOOG']}}><span class="glyphicon glyphicon-home" data-toggle="tooltip" title="{{t['Address']}}"></span></a>  <a href={{'https://na33.salesforce.com/'+t['SFid']}} id="{{t['Case#']}}">{{t['Name']}}</a></td>
+                <td class="col-md-2"><a href="{{'https://levelsolar.app.box.com/files/0/f/'+t['ITid']}}" id="{{t['Case#']|string+'install'}}">{{t['Designer']}}</a></td>
+                
+                <td class="col-md-1"><button type="button" class="btn btn-info" data-toggle="modal" data-target="#infoModalClose" data-whatever= "{{t['Case#']|string + ' ' + t['Name']}}" data-qc = "{{t['Qc']}}" data-it = "{{'https://levelsolar.app.box.com/files/0/f/'+t['ITid']}}" data-cad = "{{t['CADfile']}}" data-prb = "{{t['designIssues']}}" data-note = "{{t['Note']}}" data-sfcd = "{{t['Case#']}}"><span class="glyphicon glyphicon-info-sign"></span></button></td>
+                <div class="modal fade" id="infoModalClose" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">New message</h4>
+                      </div>
+                      <div class="modal-body">
+                      <form id="gosf" method = "post">
+                          <div class="form-group">
+                            <label for="check-by" class="control-label">Reviewed by Senior AD:</label>
+                            <input type="text" class="form-control" id="check-by" name="check-by">
+                          </div>
+                          <div class="form-group">
+                            <label for="box-install" class="control-label">Box Install Plan Folder:</label>
+                            <input type="text" class="form-control" id="box-install" name="box-install">
+                          </div>
+                          <div class="form-group">
+                            <label for="cad-pack" class="control-label">Customer Plan:</label>
+                            <input type="text" class="form-control" id="cad-pack" name="cad-pack">
+                          </div>
+                          <div class="form-group">
+                            <label for="prb-status" class="control-label">Case Status:</label>
+                            <input type="text" class="form-control" id="prb-status" name="prb-status">
+                          </div>
+                          <div class="form-group">
+                            <label for="Note" class="control-label">Design Note:</label>
+                            <textarea type="text" class="form-control" id="Note" name="Note"></textarea>
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                          </div>
+                      </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <td class="col-md-3"><a href={{'https://na33.salesforce.com/'+t['Accountid']}} data-toggle="tooltip" title="{{t['Note']}}">{{t['designIssues']}}</a></td>
+                <td class="col-md-1">
+                <form action={{'/case/caseLastCheck/' + t['Case#']|string }} method="get">
+                    <button type="submit" class="btn btn-small btn-primary">SF Updated</button>
+                </form>
+                </td>
+                {% if t['apt_ck'] == 2 %}
+                <td class="col-md-1 danger">
+                {% elif t['apt_ck'] == 1 %}
+                <td class="col-md-1 info">
+                {% else %}
+                <td class="col-md-1">
+                {% endif %}
+                {{t['CADAPT']}}
+                </td>
+                {% if session.username == 'adminjiao'%}
+                <td class="col-md-1">
+                <form action="{{'/casestatus/' + t['Case#']|string + '?api_key=Jo3y1SAW3S0M3'}}" name="statusForm" id="{{'statusForm' + t['Case#']|string}}" method="POST">
+                    <input class="span2" id="{{'status' + t['Case#']|string}}" name="status" type="hidden">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-small btn-primary dropdown-toggle" data-toggle="dropdown">Update<span class="caret"></span></button>
+                        <ul class="dropdown-menu dropdown-close_status" role="menu">
+                            <li onclick="$('#{{'status' + t['Case#']|string}}').val('999'); $('#{{'statusForm' + t['Case#']|string}}').submit()"><a href="#">Close</a></li>
+                            <li onclick="$('#{{'status' + t['Case#']|string}}').val('6'); $('#{{'statusForm' + t['Case#']|string}}').submit()"><a href="#">Soft Close</a></li>
+                            <li onclick="$('#{{'status' + t['Case#']|string}}').val('5'); $('#{{'statusForm' + t['Case#']|string}}').submit()"><a href="#">Draft</a></li>
+                        </ul>
+                    </div>
+                </form>
+                </td>
+                
+                <td class="col-md-1">
+                <form action={{'/case/caseremove/' + t['Case#']|string + '?api_key=Jo3y1SAW3S0M3' }} method="get">
+                    <button type="submit" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </form>
+                </td>
+                {% endif %}
+            </tr>
+            
+            {% endif %}
+            {% endfor %}
+        </table>
+        <br>
+        
+    </div>
+    <!-- <div role="tabpanel" class="tab-pane fade" id="Draft">
+        <table class="table table-hover"> 
+            <tr>
+                <td class="col-md-1">SFDC#</td>
+                <td class="col-md-2">Name</td>
+                <td class="col-md-3">Description</td>
+            </tr>
+            {% for t in info %}
+            {% if t['Status'] == '5' %}
+            <tr>
+                <td class="col-md-1"><a href="{{'https://levelsolar.app.box.com/files/0/f/'+t['ITid']}}" id="{{t['Case#']|string+'install'}}">{{t['Case#']}}</a></td>
+                <td class="col-md-2"><a href={{'https://www.google.com/maps/place/'+t['GOOG']}} data-toggle="tooltip" title="{{t['Address']}}"><span class="glyphicon glyphicon-home"></span></a>  {{t['Name']}}</td>
+                <td class="col-md-3"><a href={{'https://na33.salesforce.com/'+t['Accountid']}} data-toggle="tooltip" title="{{t['Note']}}">{{t['designIssues']}}</a></td>
+                <td class="col-md-1">
+                <form action="{{'/casestatus/' + t['Case#']|string}}" method="post">
+                    <input class="span2" name="status" type="hidden" value="1">
+                    <input type="submit" class="btn btn-info" value="FINALIZE!!">
+                </form>
+                </td>
+                {% if session.username == 'adminjiao'%}
+                <td class="col-md-1">
+                <form action={{'/case/caseremove/' + t['Case#']|string + '?api_key=Jo3y1SAW3S0M3' }} method="get">
+                    <button type="submit" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </form>
+                </td>
+                {% endif %}
+            <tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+    <div role="tabpanel" class="tab-pane fade" id="Need">
+        <table class="table table-hover"> 
+            <tr>
+                <td class="col-md-1">SFDC#</td>
+                <td class="col-md-2">Name</td>
+                <td class="col-md-3">Description</td>
+            </tr>
+            {% for t in info %}
+            {% if t['Status'] == '6' or t['Status'] == '7' %}
+            <tr>
+                <td class="col-md-1"><a href="{{'https://levelsolar.app.box.com/files/0/f/'+t['ITid']}}" id="{{t['Case#']|string+'install'}}">{{t['Case#']}}</a></td>
+                <td class="col-md-2"><a href={{'https://www.google.com/maps/place/'+t['GOOG']}} data-toggle="tooltip" title="{{t['Address']}}"><span class="glyphicon glyphicon-home"></span></a>  {{t['Name']}}</td>
+                <td class="col-md-3"><a href={{'https://na33.salesforce.com/'+t['Accountid']}} data-toggle="tooltip" title="{{t['Note']}}">{{t['designIssues']}}</a></td>
+                <td class="col-md-1">
+                {% if t['GG'] == 1 %}
+                <button type="button" class="btn btn-info">G2G Need st.</button>
+                {% else %}
+                <form action="{{'/needst/' + t['Case#']|string}}">
+                    <input type="submit" class="btn btn-default" value="Closed Need st.">
+                </form>
+                {% endif %}
+                </td>
+                {% if session.username == 'adminjiao'%}
+                <td class="col-md-1">
+                <form action={{'/case/caseremove/' + t['Case#']|string + '?api_key=Jo3y1SAW3S0M3' }} method="get">
+                    <button type="submit" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </form>
+                </td>
+                {% endif %}
+            <tr>               
+            {% endif %}
+            {% endfor %}
+        </table>
+        
+    </div> -->
+    <div role="tabpanel" class="tab-pane fade" id="Bad">
+        <table class="table table-hover"> 
+            <tr>
+                <td class="col-md-1">SFDC#</td>
+                <td class="col-md-2">Name</td>
+                <td class="col-md-3">Note</td>
+                <td class="col-md-2">Golden Finger</td>
+            </tr>
+            {% for t in info %}
+            {% if t['Status'] == '8' %}
+            <tr>
+                <td class="col-md-1">{{t['Case#']}}</td>
+                <td class="col-md-2"><a href={{'https://www.google.com/maps/place/'+t['GOOG']}} data-toggle="tooltip" title="{{t['Address']}}"><span class="glyphicon glyphicon-home"></span></a><a href={{'https://na33.salesforce.com/'+t['Accountid']}}>  {{t['Name']}}</a></td>
+                <td class="col-md-3">{{t['Note']}}</td>
+                <td class="col-md-1">
+                <form action="{{'/casestatus/' + t['Case#']|string + '?api_key=Jo3y1SAW3S0M3'}}" method="post">
+                    <input class="span2" name="status" type="hidden" value="1">
+                    <input type="submit" class="btn btn-info" value="SAVE!!">
+                </form>
+                </td>
+                <!-- <td class="col-md-1">
+                <form action="{{'/case/caseremove/' + t['Case#']|string + '?api_key=Jo3y1SAW3S0M3'}}" method="get">
+                    <input class="span2" name="status" type="hidden" value="1">
+                    <input type="submit" class="btn btn-danger" value="FAIL!">
+                </form>
+                </td> -->
+            <tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+
+    </div>
+    <div role="tabpanel" class="tab-pane fade" id="Support">
+    <br>
+        <div class="container" style="margin-left: -15px;cursor: pointer;">
+          <div class="row">
+            <div class="col-xs-3">
+              <div id = "panel1" class="panel panel-info panel-support" data-panelid="supportPanel1">
+                <div class="panel-heading">
+                  Box Folder
+                </div>
+                <div class="panel-body">Folder didn't get created by itself.
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-3">
+              <div id = "panel2" class="panel panel-info panel-support" data-panelid="supportPanel2">
+                <div class="panel-heading">
+                  Usage Estimation
+                </div>
+                <div class="panel-body">Homeowner moved in less than 12 months.
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-3">
+              <div id = "panel3" class="panel panel-info panel-support" data-panelid="supportPanel3">
+                <div class="panel-heading">
+                  Electrician Request
+                </div>
+                <div class="panel-body">Detached garage/ Meter/ Breaker issues.
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-3">
+              <div id = "panel4" class="panel panel-info panel-support" data-panelid="supportPanel4">
+                <div class="panel-heading">
+                  Future Install
+                </div>
+                <div class="panel-body">Fetch Install Packs for upcoming installations.
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+        <div id="supportPanel3" style="display: none;">
+          <strong>Electrician Request:</strong>
+          <table class="table table-condensed"><tr></tr></table>
+          <form class="form-inline">
+              
+              <label>Case #: </label>
+              <div class="form-group">
+                <input type="text" size='5' name=shawnsfid class="form-control" id="shawnPanelsfid">
+              </div>
+              <label>Issues:</label>
+              <div class="form-group dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" id="shawnIssue" name=shawnIssue>Select
+                <span class="caret"></span></button>
+                <ul class="dropdown-menu dropdown-shawn">
+                  <li><a href="#">Detached Garage</a></li>
+                  <li><a href="#">Rusted Meter</a></li>
+                  <li><a href="#">Breaker Issue</a></li>
+                  <li><a href="#">Other</a></li>
+                </ul>
+              </div>
+              
+              
+              <a href='#' id=shawnSend><button class='btn btn-default'>Send</button></a>
+              <div class="form-group">
+                <label id=shawnResult></label>
+                <img id="shawnLoading" src="{{ url_for('static', filename='img/loader.gif') }}" style="display: none"/>
+              </div>
+              <br>
+              <br>
+              <div id = "previewShawn" class="panel panel-info" style="display: none">
+                <div id="shawnPanelHeading" class="panel-heading">Preview:</div>
+                <div id="shawnPanelBody1" class="panel-body">Hi There:</div>
+                <div id="shawnPanelBody2" class="panel-body">Your email will show up here.</div>
+                <div id="shawnPanelBody3" class="panel-body" contentEditable>More to say? (Click to edit)</div>
+                <br>
+              </div>
+          </form>
+        </div>
+        <br>
+        
+        <div id="supportPanel2" style="display: none;">
+          <strong>Less Than 12 Months:</strong>
+          <table class="table table-condensed"><tr></tr></table>
+          <form class="form-inline">
+              <div class="form-group">
+              <label>Case #: </label>
+              <input type="text" size='5' name=sfid class="form-control"> 
+              </div>
+              <div class="form-group">
+              <label># of Months in House: </label>
+              <input type="text" size='5' name=months class="form-control"> 
+              </div>
+              <div class="form-group">
+              <label>Consumption from Utility: </label>
+              <input type="text" size='5' name=consumption class="form-control"> 
+              </div>
+              
+              <a href='#' id=lessthan12><button class='btn btn-default'>Submit</button></a>
+
+              <div class="form-group">
+              <label id=consum>...</label>
+              </div>
+          </form>
+          <br>
+          <br>
+        </div>
+
+        <div id="supportPanel4" style="display: none;">
+          <strong>Future Installs:</strong>
+          <table class="table table-condensed"><tr></tr></table>
+          <form action= "/fetchInstallPack?api_key=Jo3y1SAW3S0M3" method="post" class="form-inline">
+              <div class="form-group">
+              <label>SFDC #: </label>
+              <input type="text" size='8' name=sfidInstall class="form-control"> 
+              </div>
+              <button type="submit" class='btn btn-default'>Submit</button>
+
+<!--               <div class="form-group">
+              <label id=installResult>...</label>
+              </div> -->
+          </form>
+          <br>
+          <br>
+        </div>
+        
+        
+        <div id="supportPanel1" style="display: none;">
+          <strong>Instruction on Folder Problem: (Solve the problem then use "Build Folder")</strong>
+          <table class="table table-condensed">
+              <tr>
+                  <td class="col-md-1">#</td>
+                  <td class="col-md-3">Possible Issue</td>
+                  <td class="col-md-3">What to do?</td>
+              </tr>
+              <tr class="warning">
+                  <td class="col-md-1">1</td>
+                  <td class="col-md-3">City name misspell or missing County info</td>
+                  <td class="col-md-3">Ask CSR (Len or Jenn) to fix</td>
+              </tr>
+              <tr class="warning">
+                  <td class="col-md-1">2</td>
+                  <td class="col-md-3">New city that doesn't exist in Box</td>
+                  <td class="col-md-3">Create folder for the new city</td>
+              </tr>
+          </table>
+          <form action="/folder?api_key=Jo3y1SAW3S0M3" method="post" style="margin-left: -8px">
+              <div class="col-xs-2">
+              <input type="text" class="form-control" placeholder="Customer#" name="user_search" required/>
+              </div>
+              <button type="submit" class="btn btn-default">Build Folder</button>
+          </form>
+        <br>
+        <br>
+      </div>
+      
+    </div>
+    {% if session.username == 'adminjiao' %}
+    <div role="tabpanel" class="tab-pane fade" id="joey">
+        <br>
+        <form action="/caseread?api_key=Jo3y1SAW3S0M3" method="post">
+            <div class="col-xs-2">
+            <input type="text" class="form-control" placeholder="Customer#" name="user_search" required/>
+            </div>
+            <button type="submit" class="btn btn-default">Case read</button>
+        </form>
+        <br>
+        <table class="table table-hover"> 
+            <tr>
+                <td class="col-md-1">SFDC#</td>
+                <td class="col-md-2">Name</td>
+                <td class="col-md-1">Status</td>
+                <td class="col-md-2">Description</td>
+                <td class="col-md-2">Note</td>
+            </tr>
+            {% for t in info %}
+            <tr>
+                <td class="col-md-1">{{t['Case#']}}</td>
+                <td class="col-md-2"><a href={{'https://www.google.com/maps/place/'+t['GOOG']}}><span class="glyphicon glyphicon-home"></span></a>  {{t['Name']}}</td>
+                <td class="col-md-1">{{t['Status']}}</td>
+                <td class="col-md-2">{{t['designIssues']}}</td>
+                <td class="col-md-2">{{t['Note']}}</td>
+                <td class="col-md-2">
+                <form action="{{'/casestatus/' + t['Case#']|string + '?api_key=Jo3y1SAW3S0M3'}}" name="statusForm" id="{{'statusForm' + t['Case#']|string}}" method="POST">
+                    <input class="span2" id="{{'status' + t['Case#']|string}}" name="status" type="hidden">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-small btn-info dropdown-toggle" data-toggle="dropdown">Status Update<span class="caret"></span></button>
+                        <ul class="dropdown-menu dropdown-close_status" role="menu">
+                            <li onclick="$('#{{'status' + t['Case#']|string}}').val('0'); $('#{{'statusForm' + t['Case#']|string}}').submit()"><a href="#">0.New</a></li>
+                            <li onclick="$('#{{'status' + t['Case#']|string}}').val('1'); $('#{{'statusForm' + t['Case#']|string}}').submit()"><a href="#">1.Surveyed</a></li>
+                            <li onclick="$('#{{'status' + t['Case#']|string}}').val('1.5'); $('#{{'statusForm' + t['Case#']|string}}').submit()"><a href="#">1.5Pending</a></li>
+                            <li onclick="$('#{{'status' + t['Case#']|string}}').val('2'); $('#{{'statusForm' + t['Case#']|string}}').submit()"><a href="#">2.Approved</a></li>
+                            <li onclick="$('#{{'status' + t['Case#']|string}}').val('3'); $('#{{'statusForm' + t['Case#']|string}}').submit()"><a href="#">3.Change</a></li>
+                            <li onclick="$('#{{'status' + t['Case#']|string}}').val('4'); $('#{{'statusForm' + t['Case#']|string}}').submit()"><a href="#">4.Redesign</a></li>.
+                            <li onclick="$('#{{'status' + t['Case#']|string}}').val('5'); $('#{{'statusForm' + t['Case#']|string}}').submit()"><a href="#">5.Draft</a></li>
+                            <li onclick="$('#{{'status' + t['Case#']|string}}').val('6'); $('#{{'statusForm' + t['Case#']|string}}').submit()"><a href="#">6.Need st.</a></li>
+                            <li onclick="$('#{{'status' + t['Case#']|string}}').val('7'); $('#{{'statusForm' + t['Case#']|string}}').submit()"><a href="#">7.G2G st.</a></li>
+                            <li onclick="$('#{{'status' + t['Case#']|string}}').val('8'); $('#{{'statusForm' + t['Case#']|string}}').submit()"><a href="#">8.Bad</a></li>
+                        </ul>
+                    </div>
+                </form>
+                </td>
+                <td class="col-md-1"><button type="button" class="btn btn-default" data-toggle="modal" data-target="#infoModal3" data-whatever= "{{t['Case#']|string}}" data-info = "{{t['Info']}}"  data-note = "{{t['Note']}}" data-cklist = "{{t['issueCKBoxJoey'][0]+','+t['issueCKBoxJoey'][1]+','+t['issueCKBoxJoey'][2]+','+t['issueCKBoxJoey'][3]+','+t['issueCKBoxJoey'][4]+','+t['issueCKBoxJoey'][5]+','+t['issueCKBoxJoey'][6]+','+t['issueCKBoxJoey'][7]+','+t['issueCKBoxJoey'][8]+','+t['issueCKBoxJoey'][9]+','+t['issueCKBoxJoey'][10]+','+t['issueCKBoxJoey'][11]+','+t['issueCKBoxJoey'][12]+','+t['issueCKBoxJoey'][13]+','+t['issueCKBoxJoey'][14]+','+t['issueCKBoxJoey'][15]+','+t['issueCKBoxJoey'][16]+','+t['issueCKBoxJoey'][17]+','+t['issueCKBoxJoey'][18]+','+t['issueCKBoxJoey'][19]}}"><span class="glyphicon glyphicon-info-sign"></span></button></td>
+                <div class="modal fade" id="infoModal3" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">New message</h4>
+                      </div>
+                      <div class="modal-body">
+                        <form id="form-joey" method = "post">
+                          <div class="form-group">
+                            <label for="Info" class="control-label">Info:</label>
+                            <textarea type="text" class="form-control" id="Info" name="Info"></textarea>
+                          </div>
+                          <div class="form-group">
+                            <label for="Note_Joey" class="control-label">Design Note:</label>
+                            <textarea type="text" class="form-control" id="Note_Joey" name="Note_Joey"></textarea>
+                          </div>
+                          <div class="form-group">
+                            <label for="Note" class="control-label">Related Issues:</label>
+                            <div>
+                            <span class="list-item">
+                              {% for item in designIssue %}
+                              <label>
+                                <input type="checkbox" name={{"ckList"+(loop.index-1)|string}} id={{"ckList"+(loop.index-1)|string}}>&nbsp;{{item}}
+                              </label>
+                              {% endfor %}
+                            </span>
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                              <button type="submit" class="btn btn-primary">Save</button>
+                          </div>
+                        </form>
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <td class="col-md-2">
+                    <div class="form-group has-feedback">
+                    <form action="{{'/caseappdate/' + t['Case#']|string + '?api_key=Jo3y1SAW3S0M3'}}" method="post">
+                        <input type="text" class="form-control" value="{{t['CADAPT']}}" name="app-date" required/>
+                        <i class="glyphicon glyphicon glyphicon-floppy-disk form-control-feedback btn"></i>
+                    </form>
+                    </div>
+                </td>
+                <td class="col-md-4">
+                <form action={{'/case/caseremove/' + t['Case#']|string + '?api_key=Jo3y1SAW3S0M3' }} method="get">
+                    <button type="submit" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </form>
+                </td>
+            <tr>
+            {% endfor %}
+        </table>
+
+  </div>
+    {% endif %}
+</div>
+<strong>Labelling Method:</strong>
+<table class="table">
+    <tr>
+        <td class="col-md-1"><button type="button" class="btn btn-info">Info</button></td>
+        <td class="col-md-3" >Info complete</td>
+        <td class="col-md-1"><button type="button" class="btn btn-default">Info</button></td>
+        <td class="col-md-3">Info not complete w/ consumption</td>
+        <td class="col-md-1"><button type="button" class="btn btn-danger">Info</button></td>
+        <td class="col-md-3">Info not complete w/o consumption</td>
+    </tr>
+</table>
+
+<strong>Instruction on Design Issues (all need a Pre BMC):</strong>
+<table class="table table-condensed">
+    <tr>
+        <td class="col-md-1">#</td>
+        <td class="col-md-2">Status</td>
+        <td class="col-md-1">Powerclerk</td>
+        <td class="col-md-1">Action</td>
+        <td class="col-md-2">Who to follow up?</td>
+    </tr>
+    <tr class="success">
+        <td class="col-md-1">0</td>
+        <td class="col-md-2">Bad TSRF</td>
+        <td class="col-md-1">No</td>
+        <td class="col-md-1">Bad TSRF</td>
+        <td class="col-md-2">Design Change</td>
+    </tr>
+    <tr class="success">
+        <td class="col-md-1">1</td>
+        <td class="col-md-2">All Ok</td>
+        <td class="col-md-1">Yes</td>
+        <td class="col-md-1">Close</td>
+        <td class="col-md-2">Chill</td>
+    </tr>
+    <tr class="warning">
+        <td class="col-md-1">2</td>
+        <td class="col-md-2">Missing Meter Picture</td>
+        <td class="col-md-1">Yes</td>
+        <td class="col-md-1">Soft Close</td>
+        <td class="col-md-2">Design Change</td>
+    </tr>
+    <tr class="warning">
+        <td class="col-md-1">3</td>
+        <td class="col-md-2">Detached Garage</td>
+        <td class="col-md-1">Yes</td>
+        <td class="col-md-1">Soft Close</td>
+        <td class="col-md-2">Array Design</td>
+    </tr>
+    <tr class="warning">
+        <td class="col-md-1">4</td>
+        <td class="col-md-2">Rusted Meter</td>
+        <td class="col-md-1">Yes</td>
+        <td class="col-md-1">Soft Close</td>
+        <td class="col-md-2">Design Change</td>
+    </tr>
+    <tr class="warning">
+        <td class="col-md-1">5</td>
+        <td class="col-md-2">Breaker Issue</td>
+        <td class="col-md-1">Yes</td>
+        <td class="col-md-1">Soft Close</td>
+        <td class="col-md-2">Design Change</td>
+    </tr>
+    <tr class="warning">
+        <td class="col-md-1">6</td>
+        <td class="col-md-2">Missing Sales Pictures</td>
+        <td class="col-md-1">Yes</td>
+        <td class="col-md-1">Soft Close</td>
+        <td class="col-md-2">Design Change</td>
+    </tr>
+    <tr class="warning">
+        <td class="col-md-1">7</td>
+        <td class="col-md-2">Sealed Rafters</td>
+        <td class="col-md-1">Yes</td>
+        <td class="col-md-1">Soft Close</td>
+        <td class="col-md-2">Array Design</td>
+    </tr>
+    <tr class="warning">
+        <td class="col-md-1">8</td>
+        <td class="col-md-2">Obstruction Removal Needed</td>
+        <td class="col-md-1">Yes</td>
+        <td class="col-md-1">Soft Close</td>
+        <td class="col-md-2">Michael Kaffka</td>
+    </tr>
+    <tr class="warning">
+        <td class="col-md-1">9</td>
+        <td class="col-md-2">3 Layers of Shingles</td>
+        <td class="col-md-1">Yes</td>
+        <td class="col-md-1">Soft Close</td>
+        <td class="col-md-2">Michael Kaffka</td>
+    </tr>
+    <tr class="warning">
+        <td class="col-md-1">10</td>
+        <td class="col-md-2">Shingles/Roof to be Fixed</td>
+        <td class="col-md-1">Yes</td>
+        <td class="col-md-1">Soft Close</td>
+        <td class="col-md-2">Michael Kaffka</td>
+    </tr>
+    <tr class="warning">
+        <td class="col-md-1">11</td>
+        <td class="col-md-2">Missing Utility Number</td>
+        <td class="col-md-1">Yes</td>
+        <td class="col-md-1">Soft Close</td>
+        <td class="col-md-2">Design Change</td>
+    </tr>
+    <tr class="warning">
+        <td class="col-md-1">12</td>
+        <td class="col-md-2">Energy Audit</td>
+        <td class="col-md-1">Yes</td>
+        <td class="col-md-1">Soft Close</td>
+        <td class="col-md-2">Design Change</td>
+    </tr>
+    <tr class="danger">
+        <td class="col-md-1">13</td>
+        <td class="col-md-2">Missing Electricity Consumption</td>
+        <td class="col-md-1">No</td>
+        <td class="col-md-1">Draft</td>
+        <td class="col-md-2">Design Change</td>
+    </tr>
+    <tr class="danger">
+        <td class="col-md-1">14</td>
+        <td class="col-md-2">Tree Removal Needed</td>
+        <td class="col-md-1">No</td>
+        <td class="col-md-1">Draft</td>
+        <td class="col-md-2">Michael Kaffka</td>
+    </tr>
+    <tr class="danger">
+        <td class="col-md-1">15</td>
+        <td class="col-md-2">Two Systems Proposed</td>
+        <td class="col-md-1">Yes (2)</td>
+        <td class="col-md-1">Draft</td>
+        <td class="col-md-2">Array Design</td>
+    </tr>
+    <tr class="danger">
+        <td class="col-md-1">16</td>
+        <td class="col-md-2">Other</td>
+        <td class="col-md-1">No</td>
+        <td class="col-md-1">Draft</td>
+        <td class="col-md-2">Array Design</td>
+    </tr>
+</table>
+
+
+<strong>Instruction on Soft Close:</strong>
+<table class="table table-condensed">
+    <tr>
+        <td class="col-md-1"><b>After G2G</b></td>
+        <td class="col-md-3">Status</td>
+        <td class="col-md-3">What to do?</td>
+    </tr>
+    <tr class="warning">
+        <td class="col-md-1">1</td>
+        <td class="col-md-3">Sealed Rafters</td>
+        <td class="col-md-3">Architect Request</td>
+    </tr>
+    <tr>
+        <td class="col-md-1"><b>After Resolved</b></td>
+        <td class="col-md-3">Status</td>
+        <td class="col-md-3">What to do?</td>
+    </tr>
+    <tr class="warning">
+        <td class="col-md-1">1</td>
+        <td class="col-md-3">Sealed Rafters</td>
+        <td class="col-md-3">Reprint Documents (if necessary)</td>
+    </tr>
+    <tr class="warning">
+        <td class="col-md-1">2</td>
+        <td class="col-md-3">No Sales Pictures</td>
+        <td class="col-md-3">Reprint Documents (if necessary)</td>
+    </tr>
+    <tr class="warning">
+        <td class="col-md-1">3</td>
+        <td class="col-md-3">No Meter Pictures</td>
+        <td class="col-md-3">Reprint Documents (if necessary)</td>
+    </tr>
+    <tr class="warning">
+        <td class="col-md-1">4</td>
+        <td class="col-md-3">Missing Utility Number</td>
+        <td class="col-md-3">Reprint Documents (if necessary)</td>
+    </tr>
+    <tr class="success">
+        <td class="col-md-1">5</td>
+        <td class="col-md-3">Rusted Meter</td>
+        <td class="col-md-3">Remove from AD Home</td>
+    </tr>
+    <tr class="success">
+        <td class="col-md-1">6</td>
+        <td class="col-md-3">Breaker Issue</td>
+        <td class="col-md-3">Remove from AD Home</td>
+    </tr>
+    <tr class="success">
+        <td class="col-md-1">7</td>
+        <td class="col-md-3">3 Layers of Shingles</td>
+        <td class="col-md-3">Remove from AD Home</td>
+    </tr>
+    <tr class="success">
+        <td class="col-md-1">8</td>
+        <td class="col-md-3">Detached garage</td>
+        <td class="col-md-3">Remove from AD Home</td>
+    </tr>
+    <tr class="success">
+        <td class="col-md-1">9</td>
+        <td class="col-md-3">Obstruction Removal Needed</td>
+        <td class="col-md-3">Remove from AD Home</td>
+    </tr>
+    <tr class="success">
+        <td class="col-md-1">10</td>
+        <td class="col-md-3">Shingles/Roof to be fixed</td>
+        <td class="col-md-3">Remove from AD Home</td>
+    </tr>
+    
+</table>
+<script type="text/javascript" src="{{ url_for('static', filename='js/adhome.js') }}"></script>
+
+{% endblock %}

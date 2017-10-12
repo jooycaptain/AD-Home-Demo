@@ -1,0 +1,28 @@
+{% extends "header.html" %}
+
+{% block body %}
+
+<body>
+
+	<div class="container" align="center" style="margin: 0 auto;">
+		<h4>Fancy Register Form</h4>
+		<br>
+		{% from "_formhelpers.html" import render_field %}
+		<form method=post action="/register/">
+		<div class="form-group">
+			{{ render_field(form.username) }}
+			{{ render_field(form.email) }}
+			{{ render_field(form.password) }}
+			{{ render_field(form.confirm) }}
+			{{ render_field(form.accept_tos) }}
+			<p><input type=submit value=Register class="btn btn-info"></p>
+		</div>
+		</form>
+		{% if error %}
+			<p class="error"><strong>Error:</strong>{{ error }}</p>
+		{% endif %}
+	</div>
+
+</body>
+
+{% endblock%}

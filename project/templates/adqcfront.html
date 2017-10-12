@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>AD quality check</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    </head>
+    <body>
+        <div class="container" align="left" style = "min-high:100%">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-info alert-dismissible" role = "alert">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                {{message}}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        </div>
+        <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
+        <div class="container" align="center" style = "min-high:100%">
+            <h4>Choose the one you like the most!</h4>
+            <!-- <a href= {{urlHome + 'adqcfront/A'+info['sfdc']}}><img style="max-width:100px;" src="{{ url_for('static', filename='img/Alessandro.jpg')}}" class="img-rounded"></a><br><br> -->
+            <!-- <a href= {{urlHome + 'adqcfront/J'+info['sfdc']}}><img style="max-width:100px;" src="{{ url_for('static', filename='img/Joey.jpg')}}" class="img-rounded"></a><br><br> -->
+            <!-- <a href= {{urlHome + 'adqcfront/Y'+info['sfdc']}}><img style="max-width:100px;" src="{{ url_for('static', filename='img/Yao.jpg')}}" class="img-rounded"></a><br><br> -->
+            <!-- <a href= {{urlHome + 'adqcfront/T'+info['sfdc']}}><img style="max-width:100px;" src="{{ url_for('static', filename='img/Tina.jpg')}}" class="img-rounded"></a><br><br> -->
+            <!-- <a href= {{urlHome + 'adqcfront/V'+info['sfdc']}}><img style="max-width:100px;" src="{{ url_for('static', filename='img/Victor.jpg')}}" class="img-rounded"></a><br><br> -->
+            <a href= {{urlHome + 'adqcfront/M'+info['sfdc']}}><img style="max-width:100px;" src="{{ url_for('static', filename='img/Mike.jpg')}}" class="img-rounded"></a><br><br>
+            <a href= {{urlHome + 'adqcfront/J'+info['sfdc']}}><img style="max-width:100px;" src="{{ url_for('static', filename='img/Justin.jpg')}}" class="img-rounded"></a><br><br>
+            <a href= {{urlHome + 'adqcfront/E'+info['sfdc']}}><img style="max-width:100px;" src="{{ url_for('static', filename='img/Meredith.jpg')}}" class="img-rounded"></a><br><br>
+            <!-- <a href= {{urlHome + 'adqcfront/R'+info['sfdc']}}><img style="max-width:100px;" src="{{ url_for('static', filename='img/Ren.jpg')}}" class="img-rounded"></a><br><br> -->
+            
+        </div>
+        
+    </body>
+    
+</html>

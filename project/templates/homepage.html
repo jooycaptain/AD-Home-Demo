@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>AD Home</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+        <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    </head>
+    <body id='playground'>
+    <div class="container" align="center" style = "min-high:100%; width:100%">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-info alert-dismissible" role = "alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            {{message}}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <div class="container" align="center" style = "width:100%; position: absolute; margin: auto; top: 0; right: 0; bottom:0; left:0; height:180px; background-color: #ffffff;border: 1px solid black;opacity: 0.9;">
+          <h3>Please login:</h3>
+          <br>
+          <form action="" class="form-inline" method="post">
+            <input type="text" class="form-control" placeholder="Email address" name="email" value="{{
+              request.form.email }}">
+             <input type="password" class="form-control" placeholder="Password" name="password" value="{{
+              request.form.password }}">
+            <input class="btn btn-default" type="submit" value="Login">
+          </form>
+          {% if error %}
+            <p class="error"><strong>Error:</strong> {{ error }}</p>
+          {% endif %}
+           <div class="container">
+           <br><p>No account? <a href='/register'>Register here</a>.</p>
+           <br>
+            {% for paragraph in Body_info %}
+            <p>{{ paragraph }}</p>
+            {% endfor %}
+          </div>
+
+    </div>
+    </div>
+    </body>
+    
+        
+        
+    
+    
+</html>
+
+<style>
+
+    body {
+        background: url(http://adhome.levelsolar.com/static/img/Dinousaur.jpg) no-repeat 50% 50% fixed; 
+        -webkit-background-size: cover; 
+        -moz-background-size: cover; 
+        -o-background-size: cover; 
+        -webkit-background-size: cover;
+
+    }
+</style>
